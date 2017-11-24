@@ -25,25 +25,10 @@ epoch = 200
 weight_decay = 1e-4
 
 checkpoint_path = None
-#checkpoint_path = '/home/dmsl/nas/share/training/cifar100/cifar100'
-cpt_scopes = (['name','ADNet'],         ##  name : net's main graph ## conv's param = [batch, gamma]
-              ['conv0',[False,True]],# ['conv0/conv1',[True,True]],
-              ['conv1',[False,True]],# ['conv1/conv1',[True,True]],
-              ['conv2',[False,True]],# ['conv2/conv1',[True,True]],
-              )#, ['fc/fc2',[True]])
-
-#checkpoint_path = '/home/dmsl/Documents/tf/cifar10_student'
-#cpt_scopes = (['name','cifar10_std'],         ##  name : net's main graph ## conv's param = [batch, gamma]
-#              ['conv1',[False,False]],
-#              ['conv2',[False,False]],
-#              ['conv3',[False,False]],
-#              ['conv4',[False,False]],
-#              ['conv5',[False,False]],
-#              ['conv6',[False,False]])
+cpt_scopes = None
 ignore_missing_vars = True
 
 ### main
-#%%    
 tf.logging.set_verbosity(tf.logging.INFO)
 def _get_init_fn(checkpoint_path, cpt_scopes, ignore_missing_vars):
     if checkpoint_path is None:
@@ -123,7 +108,6 @@ def GET_dataset(dataset_name, dataset_dir, batch_size, preprocessing_name, split
         if split == 'train':
             image_preprocessing_fn = preprocessing_factory.get_preprocessing(preprocessing_name)
             images = image_preprocessing_fn(images)
-#            images = tf.to_float(images)
         else:
             images = tf.to_float(images)
             images = (images-np.array([112.4776,124.1058,129.3773]).reshape(1,1,3))/np.array([70.4587,65.4312,68.2094]).reshape(1,1,3)
@@ -167,18 +151,8 @@ def MODEL(model_name, weight_decay, image, label, lr, p, is_training):
     
 
     if is_training:
-#        loss = 0
         loss2 = end_points['Dist']
         w = 3e-1
-#        loss = tf.cond(tf.greater_equal(p,200),
-#                    lambda : loss,
-#                    lambda : loss2)
-#        w = tf.cond(tf.greater_equal(p,100),
-#                                lambda : w/9,
-#                                lambda : w)
-#        w = tf.cond(tf.greater_equal(p,150),
-#                                lambda : -(p-150)/167+3e-1,
-#                                lambda : w)
         loss2 *= w
         
         loss += loss2
@@ -202,15 +176,9 @@ with tf.Graph().as_default() as graph:
                                                           val_batch_size, preprocessing_name, 'test')
     with tf.device('/device:CPU:0'):
         decay_steps = dataset.num_samples // batch_size
-#        learning_rate = tf.train.exponential_decay(Learning_rate, global_step, decay_steps,
-#                                                   learning_rate_decay_factor, staircase=True,
-#                                                   name='exponential_decay_learning_rate')
         max_number_of_steps = int(dataset.num_samples/batch_size*epoch)
 #        max_number_of_steps = 64000
         
-#        Learning_rate = tf.cond(tf.less_equal(p,50),
-#                                lambda : Learning_rate/10,
-#                                lambda : Learning_rate)
         Learning_rate = tf.cond(tf.greater_equal(p,50),
                                 lambda : Learning_rate/10,
                                 lambda : Learning_rate)
@@ -221,18 +189,6 @@ with tf.Graph().as_default() as graph:
                                 lambda : Learning_rate/1000,
                                 lambda : Learning_rate)
         
-#        Learning_rate = tf.cond(tf.greater_equal(global_step,32000),
-#                                lambda : Learning_rate/10,
-#                                lambda : Learning_rate)
-#        Learning_rate = tf.cond(tf.greater_equal(global_step,48000),
-#                                lambda : Learning_rate/100,
-#                                lambda : Learning_rate)
-#        Learning_rate = tf.cond(tf.greater_equal(global_step,32000),
-#                                lambda : Learning_rate/1000,
-#                                lambda : Learning_rate)
-#        Learning_rate = tf.cond(tf.greater_equal(p,350),
-#                                lambda : Learning_rate/1000,
-#                                lambda : Learning_rate)
         if Optimizer == 'adam':
             optimizer = tf.train.AdamOptimizer(Learning_rate, epsilon = 1e-16)
         elif Optimizer == 'sgd':

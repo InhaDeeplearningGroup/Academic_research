@@ -6,7 +6,6 @@ import tensorflow as tf
 from nets import selu
 import scipy.io as sio
 slim = tf.contrib.slim
-#trunc_normal = lambda stddev: tf.xavier_initializer()
 
 def vgg16_small_arg_scope(weight_decay=0.0005):
     with slim.arg_scope([slim.conv2d],
