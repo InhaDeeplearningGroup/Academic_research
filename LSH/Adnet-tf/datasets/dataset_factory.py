@@ -18,24 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from datasets import stereo
-from datasets import cd
-from datasets import nerve
-from datasets import mnist
-from datasets import cifar10
-from datasets import cifar100
-from datasets import imgnet64
-from datasets import OTB100_ori
+from datasets import vot
 
 datasets_map = {
-    'stereo':stereo,
-    'cd':cd,
-    'nerve':nerve,
-    'mnist':mnist,
-    'cifar10':cifar10,
-    'cifar100':cifar100,
-    'imgnet64':imgnet64,
-    'OTB100_ori':OTB100_ori,
+    'vot':vot,
 }
 
 
